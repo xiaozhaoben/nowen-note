@@ -5,6 +5,8 @@ import { instrumentPhaseALowlight } from "@/lib/phaseAPerfDiagnostics";
 import { isPlainTextLanguage } from "@/lib/codeBlockHighlightPlugin";
 import { copyText } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
+import MermaidView from "@/components/MermaidView";
+import { isMermaidLang } from "@/lib/mermaidRenderer";
 
 const lowlight = instrumentPhaseALowlight(createCodeBlockLowlight());
 
@@ -79,6 +81,10 @@ export function MarkdownCodeBlock({ className, children }: MarkdownCodeBlockProp
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1400);
   };
+
+  if (isMermaidLang(language)) {
+    return <MermaidView source={code} debounceMs={0} className="my-4" />;
+  }
 
   const label = LANGUAGE_LABELS[language] || (language === "text" ? "Text" : language.toUpperCase());
   const lineCount = code ? code.split("\n").length : 0;

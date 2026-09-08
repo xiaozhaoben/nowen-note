@@ -6,6 +6,12 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (_key: string, fallback?: string) => fallback || _key }),
 }));
 
+vi.mock("@/components/MermaidView", () => ({
+  default: ({ source }: { source: string }) => (
+    <div data-mermaid-preview="true" data-source={source} />
+  ),
+}));
+
 import { MarkdownPreview } from "@/components/MarkdownPreview";
 
 describe("MarkdownPreview interactions", () => {
@@ -34,5 +40,16 @@ describe("MarkdownPreview interactions", () => {
     expect(output).toContain("Copy code");
     expect(output).toContain("hljs-keyword");
     expect(output).toContain("overflow-x-auto");
+  });
+
+  it("routes fenced Mermaid code to the diagram preview", () => {
+    const source = "sequenceDiagram\n  participant C as 客户端<br/>127.0.0.1:5173\n  C->>C: 校验 state";
+    const output = renderToStaticMarkup(
+      <MarkdownPreview markdown={`\`\`\`mermaid\n${source}\n\`\`\``} />,
+    );
+
+    expect(output).toContain('data-mermaid-preview="true"');
+    expect(output).toContain("客户端&lt;br/&gt;127.0.0.1:5173");
+    expect(output).not.toContain("Copy code");
   });
 });
